@@ -14,8 +14,8 @@ var colors = ['#1abc9c', '#2ecc71', '#3498db', '#8c52ff', '#9b59b6'];
 var Ball = {
     new: function (incrementedSpeed) {
         return {
-            width: 16,
-            height: 16,
+            width: 18,
+            height: 18,
             x: (this.canvas.width / 2) - 9,
             y: (this.canvas.height / 2) - 9,
             moveX: DIRECTION.IDLE,
