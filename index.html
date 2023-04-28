@@ -6,11 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./index.css">
     <script defer src="./index.js"></script>
-    <title>Pong Game</title>
+    <title>Word Search Game</title>
 </head>
 <body>
-    <h1>Pong Game</h1>
-    <canvas></canvas>
-    <p>Control the left player by using up and down arrow keys</p>
-</body>
+    <h1>Word Search Game</h1>
+    <div class="game-board">
+      <!-- The word search grid will go here -->
+    </div>
+    <div class="game-info">
+      <div>Time: <span id="time-remaining"></span></div>
+      <button id="reset-button">Reset</button>
+      <div class="message"></div>
+    </div>
+  </body>
 </html>
+
+

@@ -1,364 +1,256 @@
-// Global Variables
-var DIRECTION = {
-    IDLE: 0,
-    UP: 1,
-    DOWN: 2,
-    LEFT: 3,
-    RIGHT: 4
-};
- 
-var rounds = [5, 5, 3, 3, 2];
-var colors = ['#1abc9c', '#2ecc71', '#3498db', '#8c52ff', '#9b59b6'];
- 
-// The ball object (The cube that bounces back and forth)
-var Ball = {
-    new: function (incrementedSpeed) {
-        return {
-            width: 18,
-            height: 18,
-            x: (this.canvas.width / 2) - 9,
-            y: (this.canvas.height / 2) - 9,
-            moveX: DIRECTION.IDLE,
-            moveY: DIRECTION.IDLE,
-            speed: incrementedSpeed || 10 
-        };
+// Define your word list here
+const words = [
+  "apple",
+  "banana",
+  "cherry",
+  "date",
+  "elderberry",
+  "fig",
+  "grape",
+  "honeydew",
+  "kiwi",
+  "lemon",
+  "mango",
+  "nectarine",
+  "orange",
+  "pear",
+  "quince",
+  "raspberry",
+  "strawberry",
+  "tangerine",
+  "watermelon",
+  "dragonfruit"
+];
+
+// Define your game settings here
+const rows = 10; // number of rows in the word search grid
+const cols = 10; // number of columns in the word search grid
+const timeLimit = 120; // time limit for the game in seconds
+
+// Get DOM elements
+const gameBoard = document.querySelector(".game-board");
+const timeRemaining = document.querySelector("#time-remaining");
+const resetButton = document.querySelector("#reset-button");
+const message = document.querySelector(".message");
+
+// Define game state variables
+let gameStarted = false;
+let timerId = null;
+let secondsRemaining = timeLimit;
+let wordsFound = 0;
+
+const generateGrid = (rows, cols) => {
+  const grid = [];
+  for (let i = 0; i < rows; i++) {
+    const row = [];
+    for (let j = 0; j < cols; j++) {
+      const letter = String.fromCharCode(Math.floor(Math.random() * 26) + 65); // generate a random uppercase letter
+      row.push(letter);
     }
+    grid.push(row);
+  }
+  return grid;
+}
+
+
+const insertWords = (grid, words) => {
+  for (let word of words) {
+    let placed = false;
+    while (!placed) {
+      const direction = Math.floor(Math.random() * 8);
+      const row = Math.floor(Math.random() * rows);
+      const col = Math.floor(Math.random() * cols);
+      if (canPlaceWord(grid, word, direction, row, col)) {
+        placeWord(grid, word, direction, row, col);
+        placed = true;
+      }
+    }
+  }
+}
+
+
+const canPlaceWord = (grid, word, direction, row, col) => {
+  const wordLength = word.length;
+  const endRow = row + (wordLength - 1) * DIRECTION_DELTAS[direction][0];
+  const endCol = col + (wordLength - 1) * DIRECTION_DELTAS[direction][1];
+  if (endRow < 0 || endRow >= rows || endCol < 0 || endCol >= cols) {
+  return false;
+  }
+  for (let i = 0; i < wordLength; i++) {
+  const letter = word[i];
+  const curRow = row + i * DIRECTION_DELTAS[direction][0];
+  const curCol = col + i * DIRECTION_DELTAS[direction][1];
+  if (grid[curRow][curCol] !== letter && grid[curRow][curCol] !== " ") {
+  return false;
+       }
+    }
+  return true;
+  };
+
+  const placeWord = (grid, word, direction, row, col) => {
+    const wordLength = word.length;
+    for (let i = 0; i < wordLength; i++) {
+      const letter = word[i];
+      const curRow = row + i * DIRECTION_DELTAS[direction][0];
+      const curCol = col + i * DIRECTION_DELTAS[direction][1];
+      grid[curRow][curCol] = letter;
+    }
+  };
+  
+
+  const renderGrid = (grid) => {
+    gameBoard.innerHTML = "";
+    for (let i = 0; i < rows; i++) {
+      const rowEl = document.createElement("div");
+      rowEl.classList.add("row");
+      for (let j = 0; j < cols; j++) {
+        const letter = grid[i][j];
+        const cellEl = document.createElement("div");
+        cellEl.classList.add("cell");
+        cellEl.innerText = letter;
+        rowEl.appendChild(cellEl);
+      }
+      gameBoard.appendChild(rowEl);
+    }
+  };
+  
+  const updateTimer = () => {
+    secondsRemaining--;
+    timeRemaining.innerText = secondsRemaining;
+    if (secondsRemaining === 0) {
+    endGame(false);
+    }
+ };
+  
+ const startGame = () => {
+  gameStarted = true;
+  resetButton.disabled = true;
+  message.innerText = "";
+  grid = generateGrid(rows, cols);
+  insertWords(grid, words);
+  renderGrid(grid);
+  timerId = setInterval(updateTimer, 1000);
+  };
+  
+  const endGame = (won) => {
+    gameStarted = false;
+    clearInterval(timerId);
+    resetButton.disabled = false;
+    if (won) {
+      message.innerText = "Congratulations, you won!";
+    } else {
+      message.innerText = "Time's up! Game over.";
+    }
+  };
+  
+  
+// Define event listeners
+resetButton.addEventListener("click", startGame);
+
+gameBoard.addEventListener("mousedown", function(e) {
+  if (!gameStarted) {
+    return;
+  }
+  const cell = e.target;
+  if (cell.tagName !== "DIV" || cell.classList.contains("selected")) {
+    return;
+  }
+  const row = cell.parentNode.classList[1];
+  const col = Array.from(cell.parentNode.children).indexOf(cell);
+  const word = findWord(grid, row, col);
+  if (word) {
+    markWord(word);
+    wordsFound++;
+    if (wordsFound === words.length) {
+      endGame(true);
+    }
+  }
+});
+
+  
+  // Start the game
+  startGame();
+
+  // Define helper function to check if a string is a prefix of any word in the dictionary
+  const isPrefix = (word) => {
+    for (const dictWord of dictionary) {
+      if (dictWord.startsWith(word)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  
+
+// Define helper function to check if a string is a word in the dictionary        // FIX THIS 
+const isWord = word => dictionary.includes(word);
+
+
+// Define function to update the timer
+const updatedTimer = () => {
+  timeRemaining--;
+  document.getElementById("time-remaining").innerText = timeRemaining;
+  if (timeRemaining === 0) {
+    endGame();
+  }
 };
 
- 
-// The ai object (The two lines that move up and down)
-var Ai = {
-    new: function (side) {
-        return {
-            width: 18,
-            height: 180,
-            x: side === 'left' ? 150 : this.canvas.width - 150,
-            y: (this.canvas.height / 2) - 35,
-            score: 0,
-            move: DIRECTION.IDLE,
-            speed: 8
-        };
-    }
-};
- 
-var Game = {
-    initialize: function () {
-        this.canvas = document.querySelector('canvas');
-        this.context = this.canvas.getContext('2d');
- 
-        this.canvas.width = 1400;
-        this.canvas.height = 1000;
- 
-        this.canvas.style.width = (this.canvas.width / 2) + 'px';
-        this.canvas.style.height = (this.canvas.height / 2) + 'px';
- 
-        this.player = Ai.new.call(this, 'left');
-        this.ai = Ai.new.call(this, 'right');
-        this.ball = Ball.new.call(this);
- 
-        this.ai.speed = 8;
-        this.running = this.over = false;
-        this.turn = this.ai;
-        this.timer = this.round = 0;
-        this.color = '#8c52ff';
- 
-        Pong.menu();
-        Pong.listen();
-    },
- 
-    endGameMenu: function (text) {
-        // Change the canvas font size and color
-        Pong.context.font = '45px Courier New';
-        Pong.context.fillStyle = this.color;
- 
-        // Draw the rectangle behind the 'Press any key to begin' text.
-        Pong.context.fillRect(
-            Pong.canvas.width / 2 - 350,
-            Pong.canvas.height / 2 - 48,
-            700,
-            100
-        );
- 
-        // Change the canvas color;
-        Pong.context.fillStyle = '#ffffff';
- 
-        // Draw the end game menu text ('Game Over' and 'Winner')
-        Pong.context.fillText(text,
-            Pong.canvas.width / 2,
-            Pong.canvas.height / 2 + 15
-        );
- 
-        setTimeout(function () {
-            Pong = Object.assign({}, Game);
-            Pong.initialize();
-        }, 3000);
-    },
- 
-    menu: function () {
-        // Draw all the Pong objects in their current state
-        Pong.draw();
- 
-        // Change the canvas font size and color
-        this.context.font = '50px Courier New';
-        this.context.fillStyle = this.color;
- 
-        // Draw the rectangle behind the 'Press any key to begin' text.
-        this.context.fillRect(
-            this.canvas.width / 2 - 350,
-            this.canvas.height / 2 - 48,
-            700,
-            100
-        );
- 
-        // Change the canvas color;
-        this.context.fillStyle = '#ffffff';
- 
-        // Draw the 'press any key to begin' text
-        this.context.fillText('Press any key to begin',
-            this.canvas.width / 2,
-            this.canvas.height / 2 + 15
-        );
-    },
- 
-    // Update all objects (move the player, ai, ball, increment the score, etc.)
-    update: function () {
-        if (!this.over) {
-            // If the ball collides with the bound limits - correct the x and y coords.
-            if (this.ball.x <= 0) Pong._resetTurn.call(this, this.ai, this.player);
-            if (this.ball.x >= this.canvas.width - this.ball.width) Pong._resetTurn.call(this, this.player, this.ai);
-            if (this.ball.y <= 0) this.ball.moveY = DIRECTION.DOWN;
-            if (this.ball.y >= this.canvas.height - this.ball.height) this.ball.moveY = DIRECTION.UP;
- 
-            // Move player if they player.move value was updated by a keyboard event
-            if (this.player.move === DIRECTION.UP) this.player.y -= this.player.speed;
-            else if (this.player.move === DIRECTION.DOWN) this.player.y += this.player.speed;
- 
-            // On new serve (start of each turn) move the ball to the correct side
-            // and randomize the direction to add some challenge.
-            if (Pong._turnDelayIsOver.call(this) && this.turn) {
-                this.ball.moveX = this.turn === this.player ? DIRECTION.LEFT : DIRECTION.RIGHT;
-                this.ball.moveY = [DIRECTION.UP, DIRECTION.DOWN][Math.round(Math.random())];
-                this.ball.y = Math.floor(Math.random() * this.canvas.height - 200) + 200;
-                this.turn = null;
-            }
- 
-            // If the player collides with the bound limits, update the x and y coords.
-            if (this.player.y <= 0) this.player.y = 0;
-            else if (this.player.y >= (this.canvas.height - this.player.height)) this.player.y = (this.canvas.height - this.player.height);
- 
-            // Move ball in intended direction based on moveY and moveX values
-            if (this.ball.moveY === DIRECTION.UP) this.ball.y -= (this.ball.speed / 1.5);
-            else if (this.ball.moveY === DIRECTION.DOWN) this.ball.y += (this.ball.speed / 1.5);
-            if (this.ball.moveX === DIRECTION.LEFT) this.ball.x -= this.ball.speed;
-            else if (this.ball.moveX === DIRECTION.RIGHT) this.ball.x += this.ball.speed;
- 
-            // Handle ai (AI) UP and DOWN movement
-            if (this.ai.y > this.ball.y - (this.ai.height / 2)) {
-                if (this.ball.moveX === DIRECTION.RIGHT) this.ai.y -= this.ai.speed / 1.5;
-                else this.ai.y -= this.ai.speed / 4;
-            }
-            if (this.ai.y < this.ball.y - (this.ai.height / 2)) {
-                if (this.ball.moveX === DIRECTION.RIGHT) this.ai.y += this.ai.speed / 1.5;
-                else this.ai.y += this.ai.speed / 4;
-            }
- 
-            // Handle ai (AI) wall collision
-            if (this.ai.y >= this.canvas.height - this.ai.height) this.ai.y = this.canvas.height - this.ai.height;
-            else if (this.ai.y <= 0) this.ai.y = 0;
- 
-            // Handle Player-Ball collisions
-            if (this.ball.x - this.ball.width <= this.player.x && this.ball.x >= this.player.x - this.player.width) {
-                if (this.ball.y <= this.player.y + this.player.height && this.ball.y + this.ball.height >= this.player.y) {
-                    this.ball.x = (this.player.x + this.ball.width);
-                    this.ball.moveX = DIRECTION.RIGHT;
- 
-                }
-            }
- 
-            // Handle ai-ball collision
-            if (this.ball.x - this.ball.width <= this.ai.x && this.ball.x >= this.ai.x - this.ai.width) {
-                if (this.ball.y <= this.ai.y + this.ai.height && this.ball.y + this.ball.height >= this.ai.y) {
-                    this.ball.x = (this.ai.x - this.ball.width);
-                    this.ball.moveX = DIRECTION.LEFT;
- 
-                }
-            }
-        }
- 
-        // Handle the end of round transition
-        // Check to see if the player won the round.
-        if (this.player.score === rounds[this.round]) {
-            // Check to see if there are any more rounds/levels left and display the victory screen if
-            // there are not.
-            if (!rounds[this.round + 1]) {
-                this.over = true;
-                setTimeout(function () { Pong.endGameMenu('Winner!'); }, 1000);
-            } else {
-                // If there is another round, reset all the values and increment the round number.
-                this.color = this._generateRoundColor();
-                this.player.score = this.ai.score = 0;
-                this.player.speed += 0.5;
-                this.ai.speed += 1;
-                this.ball.speed += 1;
-                this.round += 1;
- 
-            }
-        }
-        // Check to see if the ai/AI has won the round.
-        else if (this.ai.score === rounds[this.round]) {
-            this.over = true;
-            setTimeout(function () { Pong.endGameMenu('Game Over!'); }, 1000);
-        }
-    },
- 
-    // Draw the objects to the canvas element
-    draw: function () {
-        // Clear the Canvas
-        this.context.clearRect(
-            0,
-            0,
-            this.canvas.width,
-            this.canvas.height
-        );
- 
-        // Set the fill style to black
-        this.context.fillStyle = this.color;
- 
-        // Draw the background
-        this.context.fillRect(
-            0,
-            0,
-            this.canvas.width,
-            this.canvas.height
-        );
- 
-        // Set the fill style to white (For the paddles and the ball)
-        this.context.fillStyle = '#ffffff';
- 
-        // Draw the Player
-        this.context.fillRect(
-            this.player.x,
-            this.player.y,
-            this.player.width,
-            this.player.height
-        );
- 
-        // Draw the Ai
-        this.context.fillRect(
-            this.ai.x,
-            this.ai.y,
-            this.ai.width,
-            this.ai.height 
-        );
- 
-        // Draw the Ball
-        if (Pong._turnDelayIsOver.call(this)) {
-            this.context.fillRect(
-                this.ball.x,
-                this.ball.y,
-                this.ball.width,
-                this.ball.height
-            );
-        }
- 
-        // Draw the net (Line in the middle)
-        this.context.beginPath();
-        this.context.setLineDash([7, 15]);
-        this.context.moveTo((this.canvas.width / 2), this.canvas.height - 140);
-        this.context.lineTo((this.canvas.width / 2), 140);
-        this.context.lineWidth = 10;
-        this.context.strokeStyle = '#ffffff';
-        this.context.stroke();
- 
-        // Set the default canvas font and align it to the center
-        this.context.font = '100px Courier New';
-        this.context.textAlign = 'center';
- 
-        // Draw the players score (left)
-        this.context.fillText(
-            this.player.score.toString(),
-            (this.canvas.width / 2) - 300,
-            200
-        );
- 
-        // Draw the paddles score (right)
-        this.context.fillText(
-            this.ai.score.toString(),
-            (this.canvas.width / 2) + 300,
-            200
-        );
- 
-        // Change the font size for the center score text
-        this.context.font = '30px Courier New';
- 
-        // Draw the winning score (center)
-        this.context.fillText(
-            'Round ' + (Pong.round + 1),
-            (this.canvas.width / 2),
-            35
-        );
- 
-        // Change the font size for the center score value
-        this.context.font = '40px Courier';
- 
-        // Draw the current round number
-        this.context.fillText(
-            rounds[Pong.round] ? rounds[Pong.round] : rounds[Pong.round - 1],
-            (this.canvas.width / 2),
-            100
-        );
-    },
- 
-    loop: function () {
-        Pong.update();
-        Pong.draw();
- 
-        // If the game is not over, draw the next frame.
-        if (!Pong.over) requestAnimationFrame(Pong.loop);
-    },
- 
-    listen: function () {
-        document.addEventListener('keydown', function (key) {
-            // Handle the 'Press any key to begin' function and start the game.
-            if (Pong.running === false) {
-                Pong.running = true;
-                window.requestAnimationFrame(Pong.loop);
-            }
- 
-            // Handle up arrow and w key events
-            if (key.keyCode === 38 || key.keyCode === 87) Pong.player.move = DIRECTION.UP;
- 
-            // Handle down arrow and s key events
-            if (key.keyCode === 40 || key.keyCode === 83) Pong.player.move = DIRECTION.DOWN;
-        });
- 
-        // Stop the player from moving when there are no keys being pressed.
-        document.addEventListener('keyup', function (key) { Pong.player.move = DIRECTION.IDLE; });
-    },
- 
-    // Reset the ball location, the player turns and set a delay before the next round begins.
-    _resetTurn: function(victor, loser) {
-        this.ball = Ball.new.call(this, this.ball.speed);
-        this.turn = loser;
-        this.timer = (new Date()).getTime();
- 
-        victor.score++;
-    },
- 
-    // Wait for a delay to have passed after each turn.
-    _turnDelayIsOver: function() {
-        return ((new Date()).getTime() - this.timer >= 1000);
-    },
- 
-    // Select a random color as the background of each level/round.
-    _generateRoundColor: function () {
-        var newColor = colors[Math.floor(Math.random() * colors.length)];
-        if (newColor === this.color) return Pong._generateRoundColor();
-        return newColor;
-    }
-};
- 
-var Pong = Object.assign({}, Game);
-Pong.initialize();
 
+// Define function to end the game when time is up or all words are found
+const endTheGame = () => {
+  clearInterval(timerId);
+  gameBoard.removeEventListener("mousedown", handleCellClick);
+  messageEl.innerText = `Game over! You found ${wordsFound.length} out of ${words.length} words.`;
+};
+
+
+// Define function to reset the game
+const resetGame = () => {
+  clearInterval(timerId);
+  timeRemaining = totalTime;
+  wordsFound = [];
+  gameBoard.innerHTML = "";
+  messageEl.innerText = "";
+  setupGame();
+};
+
+// Define function to set up the game board
+const setupGame = () => {
+// Create grid
+  const grid = createGrid(rows, cols);
+// Fill grid with random letters
+  fillGrid(grid, letters);
+// Hide some letters to create word search puzzle
+  hideLetters(grid, words);
+// Render grid
+  renderGrid(grid);
+// Set up timer
+  timerId = setInterval(updateTimer, 1000);
+// Set up reset button
+  resetButton.addEventListener("click", resetGame);
+// Set up click event listener for cells
+  gameBoard.addEventListener("mousedown", handleCellClick);
+  };
+
+
+  const handleCellClick = (event) => {
+    if (event.target.classList.contains("cell")) {
+      const cell = event.target;
+      const row = cell.parentNode.classList[1];
+      const col = Array.from(cell.parentNode.children).indexOf(cell);
+      const word = findWord(grid, row, col);
+      if (word && !wordsFound.includes(word)) {
+        wordsFound.push(word);
+        markWord(word);
+        messageEl.innerText = `Found word: ${word}`;
+        if (wordsFound.length === words.length) {
+          endGame();
+        }
+      }
+    }
+  };
+  
+
+// Set up game on load
+setupGame();
 
