@@ -1,12 +1,13 @@
 /* Add styling for your game here */
-.game-board {
+#game-board {
   display: grid;
   grid-template-columns: repeat(10, 1fr); /* adjust number of columns as needed */
   grid-template-rows: repeat(10, 1fr); /* adjust number of rows as needed */
-  gap: 5px; /* adjust gap size as needed */
+  gap: 0px; /* adjust gap size as needed */
   margin: 20px 0;
+  border-collapse: collapse;
 }
-.game-board div {
+#game-board div {
   border: 1px solid black;
   text-align: center;
   font-size: 24px;
@@ -22,4 +23,9 @@
   font-size: 18px;
   font-weight: bold;
   margin-top: 10px;
+}
+
+
+.highlighted{
+  border: 5px solid red !important
 }

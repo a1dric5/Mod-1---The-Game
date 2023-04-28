@@ -1,256 +1,268 @@
-// Define your word list here
-const words = [
-  "apple",
-  "banana",
-  "cherry",
-  "date",
-  "elderberry",
-  "fig",
-  "grape",
-  "honeydew",
-  "kiwi",
-  "lemon",
-  "mango",
-  "nectarine",
-  "orange",
-  "pear",
-  "quince",
-  "raspberry",
-  "strawberry",
-  "tangerine",
-  "watermelon",
-  "dragonfruit"
+//array of strings containing the words that the player needs to find in the game.
+const wordsToFind = [
+    "red", 
+    "blue", 
+    "green"
 ];
 
-// Define your game settings here
-const rows = 10; // number of rows in the word search grid
-const cols = 10; // number of columns in the word search grid
-const timeLimit = 120; // time limit for the game in seconds
-
-// Get DOM elements
-const gameBoard = document.querySelector(".game-board");
-const timeRemaining = document.querySelector("#time-remaining");
-const resetButton = document.querySelector("#reset-button");
-const message = document.querySelector(".message");
-
-// Define game state variables
-let gameStarted = false;
-let timerId = null;
-let secondsRemaining = timeLimit;
+const displayWordList = () => {
+  // select containing div
+// loop through wordstofind
+// add each word to the innerHTML of containging div
+}
+// variables used to keep track of the state of the game
+let currentWordIndex = 0;
 let wordsFound = 0;
+let timeRemaining = 60;
 
-const generateGrid = (rows, cols) => {
-  const grid = [];
-  for (let i = 0; i < rows; i++) {
-    const row = [];
-    for (let j = 0; j < cols; j++) {
-      const letter = String.fromCharCode(Math.floor(Math.random() * 26) + 65); // generate a random uppercase letter
-      row.push(letter);
+// an array that contains all the letters of the alphabet, in order.
+const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+
+// These lines of code retrieve references to specific elements in the HTML document. 
+const gameboard = document.getElementById("game-board");
+const timeRemainingDisplay = document.getElementById("time-remaining");
+const resetButton = document.getElementById("reset-button");
+const message = document.getElementById("message");
+
+//defines a function called returnRandomLetter() that returns a random letter from the alphabet array.
+const returnRandomLetter = () => {
+    const randomIndex = Math.floor(Math.random() * 26);
+    return alphabet[randomIndex];
+};
+
+console.log(returnRandomLetter);
+
+// initializes the game board and sets up the words to be found in the game.
+const putWordOnBoard = () => {
+  for (let i = 0; i < 100; i++) {
+    if (i == 3 || i == 13 || i == 43) {
+        let letterArray = wordsToFind[currentWordIndex].split("")
+        letterArray.forEach((letter)=>{
+            gameboard.innerHTML += `<div data-index="${currentWordIndex}">${letter}</div>`
+        }) 
+        i += letterArray.length
+        currentWordIndex++
     }
-    grid.push(row);
-  }
-  return grid;
-}
-
-
-const insertWords = (grid, words) => {
-  for (let word of words) {
-    let placed = false;
-    while (!placed) {
-      const direction = Math.floor(Math.random() * 8);
-      const row = Math.floor(Math.random() * rows);
-      const col = Math.floor(Math.random() * cols);
-      if (canPlaceWord(grid, word, direction, row, col)) {
-        placeWord(grid, word, direction, row, col);
-        placed = true;
-      }
-    }
-  }
-}
-
-
-const canPlaceWord = (grid, word, direction, row, col) => {
-  const wordLength = word.length;
-  const endRow = row + (wordLength - 1) * DIRECTION_DELTAS[direction][0];
-  const endCol = col + (wordLength - 1) * DIRECTION_DELTAS[direction][1];
-  if (endRow < 0 || endRow >= rows || endCol < 0 || endCol >= cols) {
-  return false;
-  }
-  for (let i = 0; i < wordLength; i++) {
-  const letter = word[i];
-  const curRow = row + i * DIRECTION_DELTAS[direction][0];
-  const curCol = col + i * DIRECTION_DELTAS[direction][1];
-  if (grid[curRow][curCol] !== letter && grid[curRow][curCol] !== " ") {
-  return false;
-       }
-    }
-  return true;
-  };
-
-  const placeWord = (grid, word, direction, row, col) => {
-    const wordLength = word.length;
-    for (let i = 0; i < wordLength; i++) {
-      const letter = word[i];
-      const curRow = row + i * DIRECTION_DELTAS[direction][0];
-      const curCol = col + i * DIRECTION_DELTAS[direction][1];
-      grid[curRow][curCol] = letter;
-    }
-  };
-  
-
-  const renderGrid = (grid) => {
-    gameBoard.innerHTML = "";
-    for (let i = 0; i < rows; i++) {
-      const rowEl = document.createElement("div");
-      rowEl.classList.add("row");
-      for (let j = 0; j < cols; j++) {
-        const letter = grid[i][j];
-        const cellEl = document.createElement("div");
-        cellEl.classList.add("cell");
-        cellEl.innerText = letter;
-        rowEl.appendChild(cellEl);
-      }
-      gameBoard.appendChild(rowEl);
-    }
-  };
-  
-  const updateTimer = () => {
-    secondsRemaining--;
-    timeRemaining.innerText = secondsRemaining;
-    if (secondsRemaining === 0) {
-    endGame(false);
-    }
+    gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`
  };
-  
- const startGame = () => {
-  gameStarted = true;
-  resetButton.disabled = true;
-  message.innerText = "";
-  grid = generateGrid(rows, cols);
-  insertWords(grid, words);
-  renderGrid(grid);
-  timerId = setInterval(updateTimer, 1000);
-  };
-  
-  const endGame = (won) => {
-    gameStarted = false;
-    clearInterval(timerId);
-    resetButton.disabled = false;
-    if (won) {
-      message.innerText = "Congratulations, you won!";
-    } else {
-      message.innerText = "Time's up! Game over.";
-    }
-  };
-  
-  
-// Define event listeners
-resetButton.addEventListener("click", startGame);
+};
 
-gameBoard.addEventListener("mousedown", function(e) {
-  if (!gameStarted) {
-    return;
-  }
-  const cell = e.target;
-  if (cell.tagName !== "DIV" || cell.classList.contains("selected")) {
-    return;
-  }
-  const row = cell.parentNode.classList[1];
-  const col = Array.from(cell.parentNode.children).indexOf(cell);
-  const word = findWord(grid, row, col);
-  if (word) {
-    markWord(word);
-    wordsFound++;
-    if (wordsFound === words.length) {
-      endGame(true);
+
+
+//responsible for checking if a word has been found on the game board.
+const checkIfWordIsFound = () => {
+    const letters = document.querySelectorAll("#game-board > div");
+    const word = wordsToFind[wordsFound];
+    const found = Array.from(letters)
+      .slice(10 * wordsFound, 10 * (wordsFound + 1))
+      .reduce((acc, curr) => acc + curr.textContent, "") === word;
+    if (found) {
+      wordsFound++;
+      message.textContent = `You found ${word}!`;
+      if (wordsFound === wordsToFind.length) {
+        message.textContent = "Congratulations, you found all the words!";
+        clearInterval(timerInterval);
+      }
     }
-  }
+  };
+
+  console.log(checkIfWordIsFound); 
+  
+  //adds the CSS class highlighted to the letterDiv, which visually highlights the letter on the game board.
+  const highlightLetter = (letterDiv) => {
+    letterDiv.classList.add("highlighted");
+    checkIfWordIsFound();
+  };
+  
+  console.log(highlightLetter)
+  //removes the "highlighted" class from a letter div element that was previously highlighted.
+  const unhighlightLetter = (letterDiv) => {
+    letterDiv.classList.remove("highlighted");
+  };
+  console.log(unhighlightLetter)
+
+  document.querySelectorAll("#game-board > div").forEach((letterDiv) => {
+    letterDiv.addEventListener("click", () => {
+      const currentWord = wordsToFind[wordsFound];
+      const currentLetter = currentWord.charAt(0);
+      if (letterDiv.textContent === currentLetter) {
+        highlightLetter(letterDiv);
+        currentWordIndex++;
+        if (currentWord.length > 1) {
+          wordsToFind[wordsFound] = currentWord.slice(1);
+        } else {
+          wordsToFind.splice(wordsFound, 1);
+        }
+        putWordOnBoard();
+      }
+    });
+    letterDiv.addEventListener("mouseover", () => {
+      if (letterDiv.textContent === wordsToFind[wordsFound].charAt(0)) {
+        highlightLetter(letterDiv);
+      }
+    });
+    letterDiv.addEventListener("mouseout", () => {
+      if (letterDiv.classList.contains("highlighted")) {
+        unhighlightLetter(letterDiv);
+      }
+    });
+  });
+  
+
+/*sets up an interval that decrements the timeRemaining variable by 1 every second, updates the timeRemainingDisplay element 
+to show the remaining time, and stops the timer and displays a "Time's up!" message once the timeRemaining reaches 0.*/
+const timerInterval = setInterval(() => {
+    timeRemaining--;
+    timeRemainingDisplay.textContent = timeRemaining;
+    if (timeRemaining === 0) {
+        clearInterval(timerInterval);
+        message.textContent = "Time's up!";
+    }
+}, 1000);
+
+console.log(timerInterval)
+putWordOnBoard()
+
+
+gameboard.addEventListener("click", checkIfWordIsFound);
+
+/*The gameboard element listens for clicks and checks if the clicked letters form one of the words to find. The resetButton element 
+resets the game and generates a new game board. The timer counts down from 60 seconds and stops when time is up or all words are found.*/
+resetButton.addEventListener("click", () => {
+    currentWordIndex = 0;
+    wordsFound = 0;
+    timeRemaining = 60;
+    gameboard.innerHTML = "";
+    putWordOnBoard();
+    timeRemainingDisplay.textContent = timeRemaining;
+    message.textContent = "";
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        timeRemainingDisplay.textContent = timeRemaining;
+        if (timeRemaining === 0) {
+            clearInterval(timerInterval);
+            message.textContent = "Time's up!";
+        }
+    }, 1000);
 });
 
-  
-  // Start the game
-  startGame();
-
-  // Define helper function to check if a string is a prefix of any word in the dictionary
-  const isPrefix = (word) => {
-    for (const dictWord of dictionary) {
-      if (dictWord.startsWith(word)) {
-        return true;
-      }
-    }
-    return false;
-  };
-  
-
-// Define helper function to check if a string is a word in the dictionary        // FIX THIS 
-const isWord = word => dictionary.includes(word);
-
-
-// Define function to update the timer
-const updatedTimer = () => {
-  timeRemaining--;
-  document.getElementById("time-remaining").innerText = timeRemaining;
-  if (timeRemaining === 0) {
-    endGame();
+for (let i = 0; i < wordsToFind.length; i++) {
+  let lettersOfWordArray = document.querySelectorAll(`[data-index="${i}"]`)
+  console.log(lettersOfWordArray);
+  for (let j = 0; j < lettersOfWordArray.length; j++) {
+  lettersOfWordArray[j].addEventListener("click", () => {
+    lettersOfWordArray.forEach((letterElement) => {
+      letterElement.classList.add("highlighted")
+    })
+  }) 
   }
 };
 
 
-// Define function to end the game when time is up or all words are found
-const endTheGame = () => {
-  clearInterval(timerId);
-  gameBoard.removeEventListener("mousedown", handleCellClick);
-  messageEl.innerText = `Game over! You found ${wordsFound.length} out of ${words.length} words.`;
-};
+
+// debugger
 
 
-// Define function to reset the game
-const resetGame = () => {
-  clearInterval(timerId);
-  timeRemaining = totalTime;
-  wordsFound = [];
-  gameBoard.innerHTML = "";
-  messageEl.innerText = "";
-  setupGame();
-};
 
-// Define function to set up the game board
-const setupGame = () => {
-// Create grid
-  const grid = createGrid(rows, cols);
-// Fill grid with random letters
-  fillGrid(grid, letters);
-// Hide some letters to create word search puzzle
-  hideLetters(grid, words);
-// Render grid
-  renderGrid(grid);
-// Set up timer
-  timerId = setInterval(updateTimer, 1000);
-// Set up reset button
-  resetButton.addEventListener("click", resetGame);
-// Set up click event listener for cells
-  gameBoard.addEventListener("mousedown", handleCellClick);
-  };
+// const wordsToFind = [
+//     "red", 
+//     "blue", 
+//     "green"]
+// let indexOfCurrentWord = 0
+
+// const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+
+// let gameboard = document.getElementById("game-board")
+
+// const returnRandomLetter = () => {
+//     const randomindex = Math.floor(Math.random() * 26) 
+//     console.log(randomindex)
+//     return alphabet[randomindex]
+// }
+
+// const putWordOnBoard = () => {
+
+// }
+// putWordOnBoard()
+// for (let i = 0; i < 100; i++) {
+//     if (i == 3 || i == 13 || i == 43) {
+//         let letterArray = wordsToFind[indexOfCurrentWord].split("")
+//         letterArray.forEach((letter)=>{
+//             gameboard.innerHTML += `<div>${letter}</div>`
+//         }) 
+//         i += letterArray.length
+//         indexOfCurrentWord++
+//     }
+//     gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`
+// };
 
 
-  const handleCellClick = (event) => {
-    if (event.target.classList.contains("cell")) {
-      const cell = event.target;
-      const row = cell.parentNode.classList[1];
-      const col = Array.from(cell.parentNode.children).indexOf(cell);
-      const word = findWord(grid, row, col);
-      if (word && !wordsFound.includes(word)) {
-        wordsFound.push(word);
-        markWord(word);
-        messageEl.innerText = `Found word: ${word}`;
-        if (wordsFound.length === words.length) {
-          endGame();
-        }
-      }
-    }
-  };
-  
+// const putWordOnBoard = () => {
+//     const word = wordsToFind[currentWordIndex];
+//     const wordLength = word.length;
+//     const startRow = Math.floor(Math.random() * (10 - wordLength));
+//     const startColumn = Math.floor(Math.random() * (10 - wordLength));
+//     const endRow = startRow + wordLength - 1;
+//     const endColumn = startColumn + wordLength - 1;
+    
+//     let index = 0;
+//     for (let i = 0; i < 100; i++) {
+//         const row = Math.floor(i / 10);
+//         const column = i % 10;
+//         if (row >= startRow && row <= endRow && column >= startColumn && column <= endColumn) {
+//             gameboard.innerHTML += `<div class="letter">${word[index]}</div>`;
+//             index++;
+//         } else {
+//             gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`;
+//         }
+//     }
+//     currentWordIndex++;
+// };
 
-// Set up game on load
-setupGame();
 
+// const putWordOnBoard = () => {
+
+// }
+// putWordOnBoard()
+// for (let i = 0; i < 100; i++) {
+//    if (i == 3 || i == 13 || i == 43) {
+//        let letterArray = wordsToFind[currentWordIndex].split("")
+//        letterArray.forEach((letter)=>{
+//            gameboard.innerHTML += `<div>${letter}</div>`
+//        }) 
+//        i += letterArray.length
+//        currentWordIndex++
+//    }
+//    gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`
+// };
+
+
+//  returns a random letter from the alphabet array.
+
+// const putWordOnBoard = () => {
+//     gameboard.innerHTML = ""; // clear the game board first
+//     wordsToFind.forEach((word) => {
+//       const letterArray = word.split("");
+//       letterArray.forEach((letter) => {
+//         gameboard.innerHTML += `<div>${letter}</div>`;
+//       });
+//       for (let i = 0; i < 10 - letterArray.length; i++) {
+//         gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`;
+//       }
+//     });
+//   };
+
+// const checkIfWordIsFound = () => {
+//     const letters = document.getElementById("letter");
+//     const word = wordsToFind[wordsFound];
+//     const found = Array.from(letters).reduce((acc, curr) => acc + curr.textContent, "") === word;
+//     if (found) {
+//         wordsFound++;
+//         message.textContent = `You found ${word}!`;
+//         if (wordsFound === wordsToFind.length) {
+//             message.textContent = "Congratulations, you found all the words!";
+//             clearInterval(timerInterval);
+//         }
+//     }
+// };
