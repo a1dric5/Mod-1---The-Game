@@ -1,7 +1,7 @@
-#Word Search Game
+# Word Search Game
 This is a simple word search game built using HTML, CSS, and JavaScript. The game randomly generates a grid of letters and hides a number of words in the grid for the player to find. The player must find all the hidden words before the time runs out.
 
-##How to Play
+## How to Play
 1. Open the index.html file in a web browser to start the game.
 2. The game will display a grid of letters and a list of words to find.
 3. Click and drag your mouse over the letters to select a word. You can select words in any direction (horizontally, vertically, diagonally).
@@ -10,7 +10,7 @@ This is a simple word search game built using HTML, CSS, and JavaScript. The gam
 6. If you get stuck, you can click the "Reset" button to start over.
 7. The game will end when you have found all the words or the time runs out.
 
-##How the Game Works
+## How the Game Works
 The game randomly generates a grid of letters and hides a number of words in the grid for the player to find. The player must find all the hidden words before the time runs out.
 
 The game includes an array of strings containing the words that the player needs to find. These words are displayed in a list on the screen.
@@ -19,7 +19,7 @@ The game generates a 10x10 grid of letters. Each letter in the grid is randomly 
 
 The player interacts with the game by clicking and dragging the mouse over the letters to select a word. When the player selects a word, the game checks if the word is one of the words to find. If it is, the word is highlighted on the grid and crossed off the list of words to find. If the player finds all the words before the time runs out, they win the game. If the time runs out before all the words are found, the game ends and the player loses.
 
-##Files
+## Files
 The game consists of the following files:
 
 index.html: The main HTML file for the game. Contains the structure of the page and includes links to the CSS and JS files.
@@ -28,7 +28,7 @@ index.css: The CSS file for the game. Contains styling for the game board and ot
 
 index.js: The JavaScript file for the game. Contains the logic for generating the game board, hiding the words in the grid, checking if the player has found a word, and handling user interactions.
 
-##Future Enhancements
+## Future Enhancements
 Here are some ideas for improving the game in the future:
 
 Add sound effects and background music to make the game more immersive.
