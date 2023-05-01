@@ -51,7 +51,7 @@ wordsToFindDiv.appendChild(wordsList);
 // variables used to keep track of the state of the game
 let currentWordIndex = 0;
 let wordsFound = 0;
-let timeRemaining = 5;
+let timeRemaining = 60;
 
 // an array that contains all the letters of the alphabet, in order.
 const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
@@ -189,7 +189,7 @@ resets the game and generates a new game board. The timer counts down from 60 se
 resetButton.addEventListener("click", () => {
     currentWordIndex = 0;
     wordsFound = 0;
-    timeRemaining = 5;
+    timeRemaining = 60;
     gameboard.innerHTML = "";
     putWordOnBoard();
     timeRemainingDisplay.textContent = timeRemaining;
