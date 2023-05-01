@@ -7,13 +7,51 @@ const wordsToFind = [
 
 const displayWordList = () => {
   // select containing div
+  const wordsDiv = document.querySelector("wordsToFind"); 
 // loop through wordstofind
-// add each word to the innerHTML of containging div
-}
+for (let i = 0; i < wordsToFind.length; i++) {
+  const word = wordsToFind[i];
+
+// add each word to the innerHTML of containing div
+const wordDiv = document.createElement('div'); 
+wordDiv.textContent = word;
+
+// append the word div to the containing div 
+wordsDiv.appendChild(wordDiv); 
+  }
+};
+
+// select the 'wordsToFind' div element
+const wordsToFindDiv = document.querySelector('.wordsToFind');
+
+// create a new heading element for the words to find and set its text content
+const wordsToFindHeading = document.createElement('h2');
+wordsToFindHeading.textContent = 'Words to Find:';
+
+// create an unordered list element to hold the words
+const wordsList = document.createElement('ul');
+
+// create a list item element for each word and add it to the unordered list
+const redWordItem = document.createElement('li');
+redWordItem.textContent = 'Red';
+wordsList.appendChild(redWordItem);
+
+const blueWordItem = document.createElement('li');
+blueWordItem.textContent = 'Blue';
+wordsList.appendChild(blueWordItem);
+
+const greenWordItem = document.createElement('li');
+greenWordItem.textContent = 'Green';
+wordsList.appendChild(greenWordItem);
+
+// append the heading and unordered list to the 'wordsToFind' div
+wordsToFindDiv.appendChild(wordsToFindHeading);
+wordsToFindDiv.appendChild(wordsList);
+
 // variables used to keep track of the state of the game
 let currentWordIndex = 0;
 let wordsFound = 0;
-let timeRemaining = 60;
+let timeRemaining = 5;
 
 // an array that contains all the letters of the alphabet, in order.
 const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
@@ -22,7 +60,7 @@ const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m
 const gameboard = document.getElementById("game-board");
 const timeRemainingDisplay = document.getElementById("time-remaining");
 const resetButton = document.getElementById("reset-button");
-const message = document.getElementById("message");
+const message = document.querySelector("h1");
 
 //defines a function called returnRandomLetter() that returns a random letter from the alphabet array.
 const returnRandomLetter = () => {
@@ -50,41 +88,48 @@ const putWordOnBoard = () => {
 
 
 //responsible for checking if a word has been found on the game board.
-const checkIfWordIsFound = () => {
-    const letters = document.querySelectorAll("#game-board > div");
-    const word = wordsToFind[wordsFound];
-    const found = Array.from(letters)
-      .slice(10 * wordsFound, 10 * (wordsFound + 1))
-      .reduce((acc, curr) => acc + curr.textContent, "") === word;
-    if (found) {
-      wordsFound++;
-      message.textContent = `You found ${word}!`;
-      if (wordsFound === wordsToFind.length) {
-        message.textContent = "Congratulations, you found all the words!";
-        clearInterval(timerInterval);
-      }
-    }
-  };
-
-  console.log(checkIfWordIsFound); 
+// const checkIfWordIsFound = () => {
+//     const letters = document.querySelectorAll("#game-board > div");
+//     const word = wordsToFind[wordsFound];
+//     const found = Array.from(letters)
+//       .slice(10 * wordsFound, 10 * (wordsFound + 1))
+//       .reduce((acc, curr) => acc + curr.textContent, "") === word;
+//     if (found) {
+//       console.log(found);
+//       wordsFound++;
+//       console.log(wordsFound);
+//       message.textContent = `You found ${word}!`;
+//       if (wordsFound === wordsToFind.length) {
+//         message.textContent = "Congratulations, you found all the words!";
+//         clearInterval(timerInterval);
+//       }
+//     }
+//   };
+  
+  // checkIfWordIsFound(); 
   
   //adds the CSS class highlighted to the letterDiv, which visually highlights the letter on the game board.
   const highlightLetter = (letterDiv) => {
     letterDiv.classList.add("highlighted");
     checkIfWordIsFound();
   };
+
+
   
-  console.log(highlightLetter)
   //removes the "highlighted" class from a letter div element that was previously highlighted.
   const unhighlightLetter = (letterDiv) => {
     letterDiv.classList.remove("highlighted");
   };
-  console.log(unhighlightLetter)
 
+
+// attaches event listeners to each letter element in the game board
   document.querySelectorAll("#game-board > div").forEach((letterDiv) => {
     letterDiv.addEventListener("click", () => {
       const currentWord = wordsToFind[wordsFound];
+      console.log(currentWord);
+      console.log(letterDiv);
       const currentLetter = currentWord.charAt(0);
+      console.log(currentLetter);
       if (letterDiv.textContent === currentLetter) {
         highlightLetter(letterDiv);
         currentWordIndex++;
@@ -111,6 +156,20 @@ const checkIfWordIsFound = () => {
 
 /*sets up an interval that decrements the timeRemaining variable by 1 every second, updates the timeRemainingDisplay element 
 to show the remaining time, and stops the timer and displays a "Time's up!" message once the timeRemaining reaches 0.*/
+
+const checkGameStatus = () => {
+  if (wordsFound === wordsToFind.length) {
+    message.innerHTML = `You Win!`;
+  } 
+  if (timeRemaining === 0 && wordsFound < wordsToFind.length) {
+    message.innerHTML = `You Lose!`;
+    console.log(wordsFound);
+  }
+
+  let highlightedWords = document.querySelectorAll(".highlighted")
+  console.log(highlightedWords.length)
+};
+
 const timerInterval = setInterval(() => {
     timeRemaining--;
     timeRemainingDisplay.textContent = timeRemaining;
@@ -120,18 +179,17 @@ const timerInterval = setInterval(() => {
     }
 }, 1000);
 
-console.log(timerInterval)
-putWordOnBoard()
+putWordOnBoard();
 
 
-gameboard.addEventListener("click", checkIfWordIsFound);
+// gameboard.addEventListener("click", checkIfWordIsFound);
 
 /*The gameboard element listens for clicks and checks if the clicked letters form one of the words to find. The resetButton element 
 resets the game and generates a new game board. The timer counts down from 60 seconds and stops when time is up or all words are found.*/
 resetButton.addEventListener("click", () => {
     currentWordIndex = 0;
     wordsFound = 0;
-    timeRemaining = 60;
+    timeRemaining = 5;
     gameboard.innerHTML = "";
     putWordOnBoard();
     timeRemainingDisplay.textContent = timeRemaining;
@@ -145,124 +203,60 @@ resetButton.addEventListener("click", () => {
             message.textContent = "Time's up!";
         }
     }, 1000);
+    foundCorrectWords();
 });
 
-for (let i = 0; i < wordsToFind.length; i++) {
-  let lettersOfWordArray = document.querySelectorAll(`[data-index="${i}"]`)
-  console.log(lettersOfWordArray);
-  for (let j = 0; j < lettersOfWordArray.length; j++) {
-  lettersOfWordArray[j].addEventListener("click", () => {
-    lettersOfWordArray.forEach((letterElement) => {
-      letterElement.classList.add("highlighted")
-    })
-  }) 
-  }
-};
 
+// sets up an event listener for each letter in each word to be found in a word search game.
+  const foundCorrectWords = () => {
 
+    for (let i = 0; i < wordsToFind.length; i++) {
+      let lettersOfWordArray = document.querySelectorAll(`[data-index="${i}"]`)
+      console.log(lettersOfWordArray);
+      for (let j = 0; j < lettersOfWordArray.length; j++) {
+      lettersOfWordArray[j].addEventListener("click", () => {
+        lettersOfWordArray.forEach((letterElement) => {
+          letterElement.classList.add("highlighted")
+          // message.textContent = `You found ${lettersOfWordArray}!`;
+        })
+        wordsFound++;
+          console.log(wordsFound);
+          checkGameStatus();
+      }) 
+      }
+    }
+  };
+  foundCorrectWords();
 
-// debugger
-
-
-
-// const wordsToFind = [
-//     "red", 
-//     "blue", 
-//     "green"]
-// let indexOfCurrentWord = 0
-
-// const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-
-// let gameboard = document.getElementById("game-board")
-
-// const returnRandomLetter = () => {
-//     const randomindex = Math.floor(Math.random() * 26) 
-//     console.log(randomindex)
-//     return alphabet[randomindex]
-// }
-
-// const putWordOnBoard = () => {
-
-// }
-// putWordOnBoard()
-// for (let i = 0; i < 100; i++) {
-//     if (i == 3 || i == 13 || i == 43) {
-//         let letterArray = wordsToFind[indexOfCurrentWord].split("")
-//         letterArray.forEach((letter)=>{
-//             gameboard.innerHTML += `<div>${letter}</div>`
-//         }) 
-//         i += letterArray.length
-//         indexOfCurrentWord++
-//     }
-//     gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`
-// };
-
-
-// const putWordOnBoard = () => {
-//     const word = wordsToFind[currentWordIndex];
-//     const wordLength = word.length;
-//     const startRow = Math.floor(Math.random() * (10 - wordLength));
-//     const startColumn = Math.floor(Math.random() * (10 - wordLength));
-//     const endRow = startRow + wordLength - 1;
-//     const endColumn = startColumn + wordLength - 1;
-    
-//     let index = 0;
-//     for (let i = 0; i < 100; i++) {
-//         const row = Math.floor(i / 10);
-//         const column = i % 10;
-//         if (row >= startRow && row <= endRow && column >= startColumn && column <= endColumn) {
-//             gameboard.innerHTML += `<div class="letter">${word[index]}</div>`;
-//             index++;
-//         } else {
-//             gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`;
-//         }
-//     }
-//     currentWordIndex++;
-// };
-
-
-// const putWordOnBoard = () => {
-
-// }
-// putWordOnBoard()
-// for (let i = 0; i < 100; i++) {
-//    if (i == 3 || i == 13 || i == 43) {
-//        let letterArray = wordsToFind[currentWordIndex].split("")
-//        letterArray.forEach((letter)=>{
-//            gameboard.innerHTML += `<div>${letter}</div>`
-//        }) 
-//        i += letterArray.length
-//        currentWordIndex++
-//    }
-//    gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`
-// };
-
-
-//  returns a random letter from the alphabet array.
-
-// const putWordOnBoard = () => {
-//     gameboard.innerHTML = ""; // clear the game board first
-//     wordsToFind.forEach((word) => {
-//       const letterArray = word.split("");
-//       letterArray.forEach((letter) => {
-//         gameboard.innerHTML += `<div>${letter}</div>`;
-//       });
-//       for (let i = 0; i < 10 - letterArray.length; i++) {
-//         gameboard.innerHTML += `<div>${returnRandomLetter()}</div>`;
+//     const checkGameStatus = () => {
+//       if (wordsFound === wordsToFind.length) {
+//         message.innerHTML = `You Win!`;
+//       } 
+//       if (timeRemaining === 0 && wordsFound < wordsToFind.length) {
+//         message.innerHTML = `You Lose!`;
+//         console.log(wordsFound);
 //       }
-//     });
-//   };
+
+//       let highlightedWords = document.querySelectorAll(".highlighted")
+//       console.log(highlightedWords.length)
+//     };
+
+// checkGameStatus();
 
 // const checkIfWordIsFound = () => {
-//     const letters = document.getElementById("letter");
-//     const word = wordsToFind[wordsFound];
-//     const found = Array.from(letters).reduce((acc, curr) => acc + curr.textContent, "") === word;
-//     if (found) {
-//         wordsFound++;
-//         message.textContent = `You found ${word}!`;
-//         if (wordsFound === wordsToFind.length) {
-//             message.textContent = "Congratulations, you found all the words!";
-//             clearInterval(timerInterval);
-//         }
+//   const letters = document.querySelectorAll("#game-board > div");
+//   const word = wordsToFind[wordsFound];
+//   const found = Array.from(letters)
+//     .slice(10 * wordsFound, 10 * (wordsFound + 1))
+//     .reduce((acc, curr) => acc + curr.textContent, "") === word;
+//   if (found) {
+//     console.log(found);
+//     wordsFound++;
+//     console.log(wordsFound);
+//     message.textContent = `You found ${word}!`;
+//     if (wordsFound === wordsToFind.length) {
+//       message.textContent = "Congratulations, you found all the words!";
+//       clearInterval(timerInterval);
 //     }
+//   }
 // };

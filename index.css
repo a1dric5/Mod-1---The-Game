@@ -1,10 +1,14 @@
+body {
+  text-align: center;
+}
+
 /* Add styling for your game here */
 #game-board {
   display: grid;
   grid-template-columns: repeat(10, 1fr); /* adjust number of columns as needed */
   grid-template-rows: repeat(10, 1fr); /* adjust number of rows as needed */
   gap: 0px; /* adjust gap size as needed */
-  margin: 20px 0;
+  margin: 20px 500px;
   border-collapse: collapse;
 }
 #game-board div {
@@ -16,8 +20,10 @@
 }
 .game-info {
   display: flex;
+  flex-direction: column; 
   justify-content: space-between;
   align-items: center;
+  margin-top: 20px;
 }
 .message {
   font-size: 18px;
@@ -27,5 +33,10 @@
 
 
 .highlighted{
-  border: 5px solid red !important
+  border: 1px solid red !important
 }
+
+h1 {
+  text-align: center;
+}
+
